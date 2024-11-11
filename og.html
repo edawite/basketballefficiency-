@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basketball Shot Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e0f7fa;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #0077b6;
+        }
+        form {
+            background-color: #b3e5fc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: inline-block;
+        }
+        input[type="number"] {
+            margin: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #0077b6;
+        }
+        button {
+            background-color: #0077b6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #005f73;
+        }
+        .court {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            width: 60%;
+            margin: 20px auto;
+        }
+        .zone {
+            padding: 20px;
+            border: 1px solid #0077b6;
+            border-radius: 50%;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        .result {
+            background-color: #b3e5fc;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            font-size: 18px;
+        }
+        .role-player {
+            background-color: #ffebcd;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<h1>Basketball Shot Efficiency Calculator</h1>
+
+<form id="shotForm">
+    <h3>Layups</h3>
+    Left: <input type="number" id="layupLeft" placeholder="%" required>
+    Right: <input type="number" id="layupRight" placeholder="%" required>
+
+    <h3>Midrange</h3>
+    Baseline (Left): <input type="number" id="midBaselineLeft" placeholder="%" required>
+    Wing (Left): <input type="number" id="midWingLeft" placeholder="%" required>
+    Middle: <input type="number" id="midMiddle" placeholder="%" required>
+    Wing (Right): <input type="number" id="midWingRight" placeholder="%" required>
+    Baseline (Right): <input type="number" id="midBaselineRight" placeholder="%" required>
+
+    <h3>Three-Pointers</h3>
+    Baseline (Left): <input type="number" id="threeBaselineLeft" placeholder="%" required>
+    Wing (Left): <input type="number" id="threeWingLeft" placeholder="%" required>
+    Middle: <input type="number" id="threeMiddle" placeholder="%" required>
+    Wing (Right): <input type="number" id="threeWingRight" placeholder="%" required>
+    Baseline (Right): <input type="number" id="threeBaselineRight" placeholder="%" required>
+
+    <button type="submit">Calculate</button>
+</form>
+
+<h3>Shooting Zones:</h3>
+<div class="court" id="court">
+    <div class="zone" id="layupLeftZone">Layup Left</div>
+    <div class="zone" id="layupRightZone">Layup Right</div>
+    <div class="zone" id="midBaselineLeftZone">Mid Baseline Left</div>
+    <div class="zone" id="midWingLeftZone">Mid Wing Left</div>
+    <div class="zone" id="midMiddleZone">Mid Middle</div>
+    <div class="zone" id="midWingRightZone">Mid Wing Right</div>
+    <div class="zone" id="midBaselineRightZone">Mid Baseline Right</div>
+    <div class="zone" id="threeBaselineLeftZone">Three Baseline Left</div>
+    <div class="zone" id="threeWingLeftZone">Three Wing Left</div>
+    <div class="zone" id="threeMiddleZone">Three Middle</div>
+    <div class="zone" id="threeWingRightZone">Three Wing Right</div>
+    <div class="zone" id="threeBaselineRightZone">Three Baseline Right</div>
+</div>
+
+<div id="result" class="result"></div>
+
+<div id="rolePlayer" class="role-player"></div>
+
+<script>
+    document.getElementById('shotForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        let shots = [
+            { name: "Left Layup", value: parseFloat(document.getElementById('layupLeft').value), points: 2, type: "layup" },
+            { name: "Right Layup", value: parseFloat(document.getElementById('layupRight').value), points: 2, type: "layup" },
+            { name: "Mid Baseline Left", value: parseFloat(document.getElementById('midBaselineLeft').value), points: 2, type: "midrange" },
+            { name: "Mid Wing Left", value: parseFloat(document.getElementById('midWingLeft').value), points: 2, type: "midrange" },
+            { name: "Mid Middle", value: parseFloat(document.getElementById('midMiddle').value), points: 2, type: "midrange" },
+            { name: "Mid Wing Right", value: parseFloat(document.getElementById('midWingRight').value), points: 2, type: "midrange" },
+            { name: "Mid Baseline Right", value: parseFloat(document.getElementById('midBaselineRight').value), points: 2, type: "midrange" },
+            { name: "Three Baseline Left", value: parseFloat(document.getElementById('threeBaselineLeft').value), points: 3, type: "three" },
+            { name: "Three Wing Left", value: parseFloat(document.getElementById('threeWingLeft').value), points: 3, type: "three" },
+            { name: "Three Middle", value: parseFloat(document.getElementById('threeMiddle').value), points: 3, type: "three" },
+            { name: "Three Wing Right", value: parseFloat(document.getElementById('threeWingRight').value), points: 3, type: "three" },
+            { name: "Three Baseline Right", value: parseFloat(document.getElementById('threeBaselineRight').value), points: 3, type: "three" }
+        ];
+
+        // Sort shots by value (percentage) in descending order
+        shots.sort((a, b) => b.value - a.value);
+
+        // Function to get the optimal shots based on the level with diversity and 50% limit
+        function getOptimalShots(totalShots, minTypes) {
+            let optimalShots = [];
+            let shotCounts = {};
+            let shotTypes = new Set();
+
+            for (let i = 0; i < shots.length && optimalShots.length < totalShots; i++) {
+                let shot = shots[i];
+                
+                // Skip if this shot would exceed 50% of total shots
+                if (shotCounts[shot.name] && shotCounts[shot.name] >= Math.floor(totalShots * 0.5)) {
+                    continue;
+                }
+
+                // Ensure diversity by limiting number of unique shot types
+                if (shotTypes.size < minTypes || shotTypes.has(shot.type)) {
+                    optimalShots.push(shot);
+                    shotCounts[shot.name] = (shotCounts[shot.name] || 0) + 1;
+                    shotTypes.add(shot.type);
+                }
+            }
+
+            // If we didn't meet the minimum diversity, fill with the remaining best shots
+            while (optimalShots.length < totalShots) {
+                for (let i = 0; i < shots.length && optimalShots.length < totalShots; i++) {
+                    let shot = shots[i];
+                    if (!shotCounts[shot.name] || shotCounts[shot.name] < Math.floor(totalShots * 0.5)) {
+                        optimalShots.push(shot);
+                        shotCounts[shot.name] = (shotCounts[shot.name] || 0) + 1;
+                        shotTypes.add(shot.type);
+                    }
+                }
+            }
+            return optimalShots;
+        }   
+
+        // Function to calculate points and group shots in the output
+        function calculateShots(optimalShots, level) {
+            let totalPoints = 0;
+            let shotBreakdown = `<strong>${level} Recommended Shots:</strong><br>`;
+            let shotSummary = {};
+
+            // Group shots and calculate expected points
+            optimalShots.forEach(shot => {
+                let shotKey = shot.name;
+                shotSummary[shotKey] = shotSummary[shotKey] || { count: 0, points: 0 };
+                shotSummary[shotKey].count += 1;
+                shotSummary[shotKey].points = shot.points;
+                totalPoints += shot.points * (shot.value / 100);
+            });
+
+            // Format the output
+            for (let [shotName, details] of Object.entries(shotSummary)) {
+                shotBreakdown += `${details.count} ${shotName} (${(details.count * details.points).toFixed(1)} points)<br>`;
+            }
+            shotBreakdown += `<br><strong>Estimated Points:</strong> You would likely average ${totalPoints.toFixed(2)} points from these shots.`;
+            
+            return shotBreakdown;
+        }
+
+        // Color the zones based on efficiency
+        let zones = [
+            document.getElementById('layupLeftZone'),
+            document.getElementById('layupRightZone'),
+            document.getElementById('midBaselineLeftZone'),
+            document.getElementById('midWingLeftZone'),
+            document.getElementById('midMiddleZone'),
+            document.getElementById('midWingRightZone'),
+            document.getElementById('midBaselineRightZone'),
+            document.getElementById('threeBaselineLeftZone'),
+            document.getElementById('threeWingLeftZone'),
+            document.getElementById('threeMiddleZone'),
+            document.getElementById('threeWingRightZone'),
+            document.getElementById('threeBaselineRightZone')
+        ];
+
+        shots.forEach((shot, index) => {
+            let zone = zones[index];
+            if (index < 3) {
+                zone.style.backgroundColor = "rgb(0, 255, 0)"; // Very green
+            } else if (index >= 3 && index < 6) {
+                zone.style.backgroundColor = "rgb(144, 238, 144)"; // Light green
+            } else if (index >= 6 && index < 9) {
+                zone.style.backgroundColor = "rgb(255, 182, 193)"; // Light red
+            } else {
+                zone.style.backgroundColor = "rgb(255, 0, 0)"; // Very red
+            }
+        });
+
+            // Usage example:
+            let rolePlayerShots = getOptimalShots(5, 2);
+            document.getElementById('rolePlayer').innerHTML = calculateShots(rolePlayerShots, 'Role Player');
+
+            let starterShots = getOptimalShots(10, 4);
+            let starterDiv = document.createElement('div');
+            starterDiv.className = "role-player";
+            starterDiv.innerHTML = calculateShots(starterShots, 'Starter');
+            document.body.appendChild(starterDiv);
+
+            let superstarShots = getOptimalShots(19, 8);
+            let superstarDiv = document.createElement('div');
+            superstarDiv.className = "role-player";
+            superstarDiv.innerHTML = calculateShots(superstarShots, 'Superstar');
+            document.body.appendChild(superstarDiv);
+                });
+</script>
+
+</body>
+</html>
