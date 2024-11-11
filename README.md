@@ -1,5 +1,5 @@
 # basketballefficiency-
-
+USE BBALL.HTML
 Overview
 The Basketball Shot Efficiency Calculator is a web-based tool that helps basketball players optimize their shot selection based on their shooting accuracy from different areas on the court. Users can input their shooting percentages for layups, midrange, and three-point shots. The tool calculates the most efficient shot distribution for three levels of play—Role Player, Starter, and Superstar—each with a specified number of shot attempts. The tool also provides a visual court representation with color-coded shooting zones based on efficiency.
 
